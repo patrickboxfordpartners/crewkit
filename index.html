@@ -275,6 +275,29 @@ table.manifest tr.row.selected .t-price { color: var(--paper); }
   .interview { grid-template-columns: 1fr; }
   #brief-wrap { border-left: none; padding-left: 0; border-top: 1px solid var(--rule-soft); padding-top: 3vh; }
 }
+
+/* --- polish layer: card surfaces, refined controls, badges, states --- */
+:root { --card: #fbf8f2; --shadow: 0 1px 2px rgba(25,21,16,.06), 0 8px 24px rgba(25,21,16,.06); --radius: 10px; --ok: #2f6b3a; }
+.ledger, table.manifest { background: var(--card); border: 1px solid var(--rule-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
+.ledger { padding: 8px 24px 4px; }
+table.manifest { border-collapse: separate; border-spacing: 0; overflow: hidden; }
+table.manifest th, table.manifest td { padding-left: 18px; }
+table.manifest tr.row:focus-visible { outline: 3px solid var(--stamp); outline-offset: -3px; }
+.chip { border-radius: 999px !important; min-height: 40px; transition: background .12s, border-color .12s; }
+.chip:focus-visible, #dispatch-btn:focus-visible, textarea:focus-visible { outline: 3px solid var(--stamp); outline-offset: 2px; }
+#brief { border-radius: 8px; }
+#dispatch-btn { border-radius: 8px; box-shadow: var(--shadow); min-height: 48px; }
+.wallet { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--rule-soft); border-radius: 999px; padding: 8px 14px; }
+.badge { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.badge.ok { background: rgba(47,107,58,.12); color: var(--ok); }
+.badge.err { background: rgba(165,42,21,.12); color: var(--stamp-ink); }
+.badge.wait { background: var(--paper-deep); color: var(--ink-soft); }
+.receipt { background: var(--card); border: 1px solid var(--rule-soft); border-left: 4px solid var(--ok); border-radius: var(--radius); padding: 16px 20px; box-shadow: var(--shadow); }
+.receipt.is-err { border-left-color: var(--stamp); }
+.spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -1px; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner, .stamp.on { animation: none; } .stamp.on { opacity: .92; transform: rotate(-8deg); } }
+@media (max-width: 720px) { .ledger { padding: 4px 14px; } #dispatch-btn { width: 100%; padding: 18px; } }
 </style>
 </head>
 <body>
@@ -317,7 +340,7 @@ table.manifest tr.row.selected .t-price { color: var(--paper); }
       <tr><th>Configuration</th><th class="hide-m">Review passes</th><th class="hide-m">Governance</th><th class="t-fill">Price</th></tr>
     </thead>
     <tbody>
-      <tr class="row" data-tier="mvp" id="row-mvp">
+      <tr class="row" tabindex="0" data-tier="mvp" id="row-mvp">
         <td><div class="t-name">MVP</div><div class="t-model">Grok-3-mini · 1 builder · best effort</div></td>
         <td class="hide-m">1</td>
         <td class="hide-m">—</td>
@@ -329,17 +352,11 @@ table.manifest tr.row.selected .t-price { color: var(--paper); }
         <td class="hide-m">Reviewer sign-off</td>
         <td class="t-fill"><span class="t-price" id="price-mid">—</span></td>
       </tr>
-      <tr class="row" data-tier="premium" id="row-premium">
+      <tr class="row" tabindex="0" data-tier="premium" id="row-premium">
         <td><div class="t-name">Premium</div><div class="t-model">Claude Opus + extended thinking · deep security scan</div></td>
         <td class="hide-m">3</td>
         <td class="hide-m">Founder sign-off before deploy</td>
         <td class="t-fill"><span class="t-price" id="price-premium">—</span></td>
-      </tr>
-      <tr class="row" data-tier="flagship" id="row-flagship">
-        <td><div class="t-name">Flagship</div><div class="t-model">Fable — frontier model · full crew at maximum depth</div></td>
-        <td class="hide-m">4</td>
-        <td class="hide-m">Founder sign-off · priority queue · war-room cadence</td>
-        <td class="t-fill"><span class="t-price" id="price-flagship">—</span></td>
       </tr>
     </tbody>
   </table>
@@ -362,10 +379,11 @@ table.manifest tr.row.selected .t-price { color: var(--paper); }
     <div class="line"><span class="k">Review passes</span><span class="v" id="q-reviews">—</span></div>
     <div class="line"><span class="k">Agent compute cost</span><span class="v" id="q-cost">—</span></div>
     <div class="line"><span class="k">Margin ×2</span><span class="v" id="q-margin">×2</span></div>
+    <div class="line"><span class="k">Studio fee (flat)</span><span class="v" id="q-fee">$49</span></div>
     <div class="line total"><span class="k">Price</span><span class="v" id="q-price">—</span></div>
   </div>
 
-  <div class="wallet">Wallet: <b id="credits">…</b> credits on file · Flexprice</div>
+  <div class="wallet" aria-live="polite"><span class="badge wait" id="credits-badge">Checking</span> Wallet: <b id="credits">…</b> credits on file · Flexprice</div>
 
   <div class="folio"><span><b>III</b> / IV — The Quote</span><span>↓</span></div>
 </section>
@@ -379,7 +397,7 @@ table.manifest tr.row.selected .t-price { color: var(--paper); }
 
   <div class="stamp" id="stamp">Dispatched</div>
 
-  <div class="receipt" id="receipt"></div>
+  <div class="receipt" id="receipt" role="status" aria-live="polite"></div>
 
   <div class="folio">
     <span><b>IV</b> / IV — Dispatch</span>
@@ -452,7 +470,7 @@ askNext();
 
 async function refreshQuote() {
   const qs = new URLSearchParams({tier, ...answers});
-  for (const t of ["mvp", "mid", "premium", "flagship"]) {
+  for (const t of ["mvp", "mid", "premium"]) {
     const p = new URLSearchParams({tier: t, work: answers.work || "feature",
                                     surface: answers.surface || "both",
                                     gate: answers.gate || "no_gate", rush: answers.rush || "standard"});
@@ -473,13 +491,22 @@ function fillLedger(q) {
     `${q.scoped_tokens.toLocaleString()} scoped → ${q.est_tokens.toLocaleString()} w/ tier`;
   document.getElementById("q-reviews").textContent = q.reviews;
   document.getElementById("q-cost").textContent = `$${q.est_agent_cost_usd}`;
+  document.getElementById("q-fee").textContent = `$${q.flat_fee_usd}`;
   document.getElementById("q-price").textContent = `$${q.price_usd}`;
 }
 
 async function refreshCredits() {
-  const r = await fetch("/api/credits");
-  const c = await r.json();
-  document.getElementById("credits").textContent = c.balance ?? "—";
+  const badge = document.getElementById("credits-badge");
+  try {
+    const r = await fetch("/api/credits");
+    const c = await r.json();
+    document.getElementById("credits").textContent = c.balance ?? "—";
+    badge.className = r.ok ? "badge ok" : "badge err";
+    badge.textContent = r.ok ? "Live" : "Unavailable";
+  } catch (e) {
+    document.getElementById("credits").textContent = "—";
+    badge.className = "badge err"; badge.textContent = "Offline";
+  }
 }
 
 /* --- tiers + dispatch --- */
@@ -491,6 +518,7 @@ document.querySelectorAll("tr.row").forEach(row => {
     tier = row.dataset.tier;
     refreshQuote();
   });
+  row.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); row.click(); } });
 });
 
 document.getElementById("dispatch-btn").addEventListener("click", async () => {
@@ -504,24 +532,33 @@ document.getElementById("dispatch-btn").addEventListener("click", async () => {
     document.getElementById("s1").scrollIntoView({behavior: "smooth"});
     return;
   }
-  btn.disabled = true; btn.textContent = "Checking credits…";
-  const r = await fetch("/api/order", {method: "POST", headers: {"Content-Type": "application/json"},
-                                       body: JSON.stringify({brief, tier, ...answers})});
-  const j = await r.json();
-  btn.disabled = false; btn.textContent = "Dispatch to crew →";
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" aria-hidden="true"></span>Checking credits…';
+  btn.setAttribute("aria-busy", "true");
+  let r, j;
+  try {
+    r = await fetch("/api/order", {method: "POST", headers: {"Content-Type": "application/json"},
+                                   body: JSON.stringify({brief, tier, ...answers})});
+    j = await r.json().catch(() => ({error: "Unexpected response from the storefront."}));
+  } catch (e) {
+    r = {ok: false}; j = {error: "Network error: could not reach the storefront. Please retry."};
+  }
+  btn.disabled = false; btn.textContent = "Dispatch to crew →"; btn.removeAttribute("aria-busy");
   receipt.classList.add("on");
+  receipt.classList.toggle("is-err", !r.ok);
   if (r.ok) {
     stamp.classList.remove("on"); void stamp.offsetWidth; stamp.classList.add("on");
     receipt.innerHTML =
-      `ORDER DISPATCHED — ${j.tier} tier, $${j.price_usd}.<br>` +
-      `Scope: ${j.scope}. The crew has the brief and the scoping from your interview.<br>` +
+      `<span class="badge ok">Dispatched</span><br>${esc(j.tier)} tier, $${esc(j.price_usd)}.<br>` +
+      `Scope: ${esc(j.scope)}. The crew has the brief and the scoping from your interview.<br>` +
       `Watch the floor: <b>app.band.ai</b> · room: lexis-crew`;
     refreshCredits();
   } else {
-    receipt.innerHTML = `<span class="err">${j.error}</span>` +
-      (j.needed ? `<br>Need $${j.needed}, wallet holds $${j.balance}. Top up at us.flexprice.io.` : "");
+    receipt.innerHTML = `<span class="badge err">Not dispatched</span><br><span class="err">${esc(j.error || "Something went wrong.")}</span>` +
+      (j.needed ? `<br>Need $${esc(j.needed)}, wallet holds $${esc(j.balance)}. Top up at us.flexprice.io.` : "");
   }
 });
+
+function esc(v) { return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
 refreshCredits();
 </script>
