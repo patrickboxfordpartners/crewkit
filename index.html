@@ -358,6 +358,12 @@ table.manifest tr.row:focus-visible { outline: 3px solid var(--stamp); outline-o
         <td class="hide-m">Founder sign-off before deploy</td>
         <td class="t-fill"><span class="t-price" id="price-premium">—</span></td>
       </tr>
+      <tr class="row" tabindex="0" data-tier="flagship" id="row-flagship">
+        <td><div class="t-name">Flagship</div><div class="t-model">Fable — frontier model · full crew at maximum depth</div></td>
+        <td class="hide-m">4</td>
+        <td class="hide-m">Founder sign-off · priority queue · war-room cadence</td>
+        <td class="t-fill"><span class="t-price" id="price-flagship">—</span></td>
+      </tr>
     </tbody>
   </table>
 
@@ -470,7 +476,7 @@ askNext();
 
 async function refreshQuote() {
   const qs = new URLSearchParams({tier, ...answers});
-  for (const t of ["mvp", "mid", "premium"]) {
+  for (const t of ["mvp", "mid", "premium", "flagship"]) {
     const p = new URLSearchParams({tier: t, work: answers.work || "feature",
                                     surface: answers.surface || "both",
                                     gate: answers.gate || "no_gate", rush: answers.rush || "standard"});

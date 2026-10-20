@@ -44,6 +44,7 @@ TIERS = {
     "mvp": {"label": "MVP", "model": "Grok-3-mini", "token_mult": 1.0, "reviews": 1, "margin": 2.0, "per_1k": 0.0006},
     "mid": {"label": "Mid-tier", "model": "Claude Sonnet", "token_mult": 2.5, "reviews": 2, "margin": 2.0, "per_1k": 0.009},
     "premium": {"label": "Premium", "model": "Claude Opus + extended thinking", "token_mult": 5.0, "reviews": 3, "margin": 2.0, "per_1k": 0.045},
+    "flagship": {"label": "Flagship", "model": "Fable — the frontier model", "token_mult": 8.0, "reviews": 4, "margin": 2.0, "per_1k": 0.075},
 }
 
 # Interview scoping: each answer sets a multiplier on the base estimate.
