@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrewKit — Chapter Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f2ede3;
+  --ink: #191510;
+  --ink-soft: #4a4438;
+  --rule-soft: rgba(25,21,16,.25);
+  --stamp: #a52a15;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* start on black for the opening cut */
+body.pre { background: #0c0a08; }
+body.pre .card { opacity: 0; }
+
+.card {
+  position: absolute; inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 10vw;
+}
+.card.on { display: flex; }
+
+.masthead {
+  position: absolute; top: 6vh; left: 10vw; right: 10vw;
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 10px;
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+}
+.masthead .dot { color: var(--stamp); }
+
+.folio {
+  position: absolute; bottom: 6vh; left: 10vw; right: 10vw;
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+  border-top: 1px solid var(--rule-soft); padding-top: 8px;
+}
+
+.num {
+  font-size: clamp(60px, 11vw, 150px);
+  font-family: "Fraunces", serif;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--stamp);
+  line-height: 1;
+  margin-bottom: 2vh;
+}
+
+h2 {
+  font-family: "Fraunces", serif;
+  font-weight: 900;
+  font-size: clamp(52px, 9vw, 130px);
+  line-height: .95;
+  letter-spacing: -0.015em;
+}
+h2 em { font-style: italic; font-weight: 300; color: var(--ink-soft); }
+
+.sub {
+  margin-top: 3vh;
+  font-size: 14px;
+  color: var(--ink-soft);
+  max-width: 46ch;
+  line-height: 1.7;
+}
+
+/* the stamped frame for the final card */
+.stampbox {
+  position: absolute;
+  right: 10vw; top: 30vh;
+  transform: rotate(-7deg);
+  border: 4px solid var(--stamp);
+  color: var(--stamp);
+  padding: 10px 26px;
+  font-weight: 600; font-size: 30px; letter-spacing: .18em; text-transform: uppercase;
+  border-radius: 4px;
+  mix-blend-mode: multiply;
+  opacity: 0;
+}
+.card.on .stampbox { animation: stamp .5s cubic-bezier(.2, 2.2, .4, 1) .8s forwards; }
+@keyframes stamp {
+  0% { transform: rotate(-7deg) scale(3); opacity: 0; }
+  60% { transform: rotate(-7deg) scale(.92); opacity: 1; }
+  100% { transform: rotate(-7deg) scale(1); opacity: .92; }
+}
+
+/* entrance: title settles in from a hair high */
+.card.on .body { animation: settle .55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes settle {
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.hint {
+  position: fixed; bottom: 1.5vh; left: 50%; transform: translateX(-50%);
+  font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink-soft);
+  opacity: .6; z-index: 60;
+}
+</style>
+</head>
+<body class="pre">
+
+<div class="masthead">
+  <div>CrewKit <span class="dot">·</span> Agent Dev Studio</div>
+  <div>Demo Reel <span class="dot">·</span> SF Startup Challenge</div>
+</div>
+
+<!-- ═════ CARD 0 — cold open ═════ -->
+<section class="card" id="c0">
+  <div class="body">
+    <div class="num">No. 003</div>
+    <h2>A startup,<br><em>run by a crew.</em></h2>
+    <div class="sub">One founder. Nine agents. Three harnesses. One plan, one board,
+    one memory — and a human only when a real decision is needed.</div>
+  </div>
+  <div class="stampbox">Work Order</div>
+  <div class="folio"><span>CrewKit</span><span>→</span></div>
+</section>
+
+<!-- ═════ CARD 1 — the brief ═════ -->
+<section class="card" id="c1">
+  <div class="body">
+    <div class="num">I.</div>
+    <h2>The Brief.</h2>
+    <div class="sub">A customer describes the software in plain words.
+    The storefront prices the crew honestly — model, tokens, margin — like a work order, not a checkout page.</div>
+  </div>
+  <div class="folio"><span>I / V — The Brief</span><span>→</span></div>
+</section>
+
+<!-- ═════ CARD 2 — the floor ═════ -->
+<section class="card" id="c2">
+  <div class="body">
+    <div class="num">II.</div>
+    <h2>The Floor.</h2>
+    <div class="sub">Band carries the order to the crew room. The planner breaks it into board items;
+    builders claim, @mention, and hand off. Claude Code, Codex and Copilot — different harnesses, one plan.</div>
+  </div>
+  <div class="folio"><span>II / V — The Floor</span><span>→</span></div>
+</section>
+
+<!-- ═════ CARD 3 — the memory ═════ -->
+<section class="card" id="c3">
+  <div class="body">
+    <div class="num">III.</div>
+    <h2>The Memory.</h2>
+    <div class="sub">Every decision, finding and lesson goes into Cognee — a knowledge graph that outlives
+    any session. Kill the crew, start a new one: it remembers the customer, the codebase, the mistakes
+    it will not repeat.</div>
+  </div>
+  <div class="folio"><span>III / V — The Memory</span><span>→</span></div>
+</section>
+
+<!-- ═════ CARD 4 — the gate ═════ -->
+<section class="card" id="c4">
+  <div class="body">
+    <div class="num">IV.</div>
+    <h2>The Gate.</h2>
+    <div class="sub">Nothing moves to Done until the security agent's Snyk scan is clean.
+    Recurring findings are written to memory — the crew stops repeating its own mistakes.</div>
+  </div>
+  <div class="folio"><span>IV / V — The Gate</span><span>→</span></div>
+</section>
+
+<!-- ═════ CARD 5 — the ledger ═════ -->
+<section class="card" id="c5">
+  <div class="body">
+    <div class="num">V.</div>
+    <h2>The Ledger.</h2>
+    <div class="sub">Flexprice meters every agent token and shipped feature into credits, wallets and invoices.
+    The factory knows its unit economics — and bills for them.</div>
+  </div>
+  <div class="folio"><span>V / V — The Ledger</span><span>→</span></div>
+</section>
+
+<!-- ═════ CARD 6 — close ═════ -->
+<section class="card" id="c6">
+  <div class="body">
+    <div class="num">No. 003</div>
+    <h2>Dispatched.</h2>
+    <div class="sub">CrewKit — software, built by a crew you never manage.<br><br>
+    Band <span class="dot">·</span> Cognee <span class="dot">·</span> Snyk <span class="dot">·</span> Flexprice</div>
+  </div>
+  <div class="stampbox">Dispatched</div>
+  <div class="folio"><span>CrewKit · Boxford fleet</span><span>END</span></div>
+</section>
+
+<div class="hint">← → to advance · 0 to cut from black</div>
+
+<script>
+const cards = ["c0","c1","c2","c3","c4","c5","c6"];
+let i = -1;
+
+function show(n) {
+  if (n < -1 || n >= cards.length) return;
+  i = n;
+  cards.forEach((id, k) => {
+    document.getElementById(id).classList.toggle("on", k === i);
+  });
+  document.body.classList.toggle("pre", i === -1);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(i + 1); }
+  if (e.key === "ArrowLeft") show(i - 1);
+  if (e.key === "0") show(-1);
+});
+document.addEventListener("click", () => show(i + 1));
+
+show(-1);
+</script>
+</body>
+</html>

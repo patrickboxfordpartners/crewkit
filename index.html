@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrewKit — Work Order No. 003</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f2ede3;
+  --paper-deep: #e9e2d3;
+  --ink: #191510;
+  --ink-soft: #4a4438;
+  --rule: #191510;
+  --rule-soft: rgba(25,21,16,.25);
+  --stamp: #a52a15;
+  --stamp-ink: #8f2312;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-snap-type: y mandatory; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* paper grain */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 50;
+}
+
+.slide {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  padding: 6vh 8vw;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* --- shared chrome --- */
+
+.masthead {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 3px solid var(--rule);
+  padding-bottom: 10px;
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+}
+.masthead .dot { color: var(--stamp); }
+
+.folio {
+  position: absolute; bottom: 5vh; left: 8vw; right: 8vw;
+  display: flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+  border-top: 1px solid var(--rule-soft); padding-top: 8px;
+}
+.folio b { color: var(--ink); }
+
+h1, h2 { font-family: "Fraunces", serif; font-weight: 900; line-height: .95; letter-spacing: -0.015em; }
+
+.slide-label {
+  font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft);
+  margin: 4vh 0 1.5vh;
+}
+.slide-label .no { color: var(--stamp); font-weight: 600; }
+
+/* --- slide 1: the brief --- */
+
+#s1 h1 {
+  font-size: clamp(48px, 8.5vw, 110px);
+  margin-top: 6vh;
+  max-width: 12ch;
+}
+#s1 h1 em { font-style: italic; font-weight: 300; color: var(--ink-soft); }
+
+#brief {
+  margin-top: 5vh;
+  width: min(680px, 100%);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  font-family: "Fraunces", serif;
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 600;
+  color: var(--ink);
+  padding: 12px 0;
+  resize: none;
+}
+#brief:focus { outline: none; border-bottom-color: var(--stamp); }
+#brief::placeholder { color: rgba(25,21,16,.35); font-weight: 300; font-style: italic; }
+
+/* --- slide 1: intake interview --- */
+
+.interview {
+  margin-top: 4vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 4vw;
+  align-items: start;
+  max-width: 1100px;
+}
+
+.transcript { font-size: 14px; line-height: 2; min-height: 120px; }
+.transcript .q { color: var(--ink-soft); }
+.transcript .q::before { content: "CREWKIT — "; font-size: 10px; letter-spacing: .15em; color: var(--stamp); }
+.transcript .a { font-weight: 600; }
+.transcript .a::before { content: "YOU — "; font-size: 10px; letter-spacing: .15em; color: var(--ink-soft); font-weight: 400; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 2.5vh; }
+.chip {
+  background: transparent;
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.chip:hover { background: var(--ink); color: var(--paper); }
+.chip.picked { background: var(--stamp); border-color: var(--stamp); color: var(--paper); }
+
+#brief-wrap { border-left: 1px solid var(--rule-soft); padding-left: 3vw; }
+.brief-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .15em;
+  color: var(--ink-soft); margin-bottom: 1.5vh;
+}
+.brief-label b { color: var(--stamp); }
+#brief {
+  width: 100%;
+  margin-top: 0;
+  min-height: 26vh;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  font-family: "Fraunces", serif;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 600;
+  color: var(--ink);
+  padding: 10px 0;
+  resize: none;
+}
+#brief:focus { outline: none; border-bottom-color: var(--stamp); }
+#brief::placeholder { color: rgba(25,21,16,.35); font-weight: 300; font-style: italic; }
+
+.crew-line {
+  margin-top: 4vh; font-size: 12px; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--ink-soft);
+}
+.crew-line span { color: var(--ink); }
+.crew-line .live { color: var(--stamp); font-weight: 600; }
+.crew-line .live::before { content: "● "; }
+
+/* --- slide 2: tiers as a manifest table --- */
+
+#s2 h2 { font-size: clamp(34px, 4.5vw, 56px); max-width: 14ch; }
+
+table.manifest {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4vh;
+  font-size: 14px;
+}
+table.manifest th {
+  text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase;
+  letter-spacing: .12em; color: var(--ink-soft);
+  border-bottom: 2px solid var(--ink); padding: 10px 12px 10px 0;
+}
+table.manifest td {
+  border-bottom: 1px solid var(--rule-soft);
+  padding: 18px 12px 18px 0; vertical-align: top;
+}
+table.manifest tr.row { cursor: pointer; transition: background .12s; }
+table.manifest tr.row:hover { background: var(--paper-deep); }
+table.manifest tr.row.selected { background: var(--ink); color: var(--paper); }
+table.manifest tr.row.selected .t-name, table.manifest tr.row.selected .t-model,
+table.manifest tr.row.selected .t-price { color: var(--paper); }
+.t-name { font-family: "Fraunces", serif; font-weight: 900; font-size: 22px; }
+.t-model { color: var(--ink-soft); font-size: 12px; margin-top: 4px; }
+.t-price { font-weight: 600; }
+.t-fill { text-align: right; }
+
+/* --- slide 3: the quote ledger --- */
+
+#s3 h2 { font-size: clamp(34px, 4.5vw, 56px); }
+
+.ledger {
+  width: min(560px, 100%);
+  margin-top: 4vh;
+}
+.ledger .line {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 14px 0; border-bottom: 1px solid var(--rule-soft);
+}
+.ledger .line.total {
+  border-bottom: 3px double var(--ink);
+  border-top: 3px double var(--ink);
+  margin-top: -3px; padding: 18px 0;
+  font-weight: 600;
+}
+.ledger .k { color: var(--ink-soft); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+.ledger .v { font-weight: 500; }
+.ledger .line.total .v { font-family: "Fraunces", serif; font-weight: 900; font-size: 34px; }
+
+.wallet {
+  margin-top: 3vh; font-size: 12px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .1em;
+}
+.wallet b { color: var(--ink); font-weight: 600; }
+
+/* --- slide 4: dispatch --- */
+
+#s4 h2 { font-size: clamp(34px, 4.5vw, 56px); max-width: 16ch; }
+
+#dispatch-btn {
+  margin-top: 5vh;
+  align-self: flex-start;
+  background: var(--ink); color: var(--paper);
+  border: 2px solid var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 15px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase;
+  padding: 20px 42px;
+  cursor: pointer;
+  transition: transform .1s, background .15s;
+}
+#dispatch-btn:hover { background: var(--stamp); border-color: var(--stamp); }
+#dispatch-btn:active { transform: translateY(2px); }
+#dispatch-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.stamp {
+  position: absolute;
+  right: 10vw; top: 32vh;
+  transform: rotate(-8deg) scale(3);
+  opacity: 0;
+  border: 4px solid var(--stamp);
+  color: var(--stamp);
+  padding: 8px 20px;
+  font-weight: 600; font-size: 26px; letter-spacing: .18em; text-transform: uppercase;
+  border-radius: 4px;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.stamp.on {
+  animation: stamp .45s cubic-bezier(.2, 2.2, .4, 1) forwards;
+}
+@keyframes stamp {
+  0% { transform: rotate(-8deg) scale(3); opacity: 0; }
+  60% { transform: rotate(-8deg) scale(.92); opacity: 1; }
+  100% { transform: rotate(-8deg) scale(1); opacity: .92; }
+}
+
+.receipt {
+  margin-top: 4vh;
+  max-width: 560px;
+  font-size: 13px;
+  line-height: 1.8;
+  display: none;
+}
+.receipt.on { display: block; }
+.receipt .err { color: var(--stamp-ink); font-weight: 600; }
+
+@media (max-width: 720px) {
+  .slide { padding: 5vh 6vw; }
+  table.manifest .hide-m { display: none; }
+  .stamp { right: 6vw; top: 20vh; font-size: 18px; }
+  .interview { grid-template-columns: 1fr; }
+  #brief-wrap { border-left: none; padding-left: 0; border-top: 1px solid var(--rule-soft); padding-top: 3vh; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SLIDE I ═══════════ -->
+<section class="slide" id="s1">
+  <div class="masthead">
+    <div>CrewKit <span class="dot">·</span> Agent Dev Studio</div>
+    <div>Work Order No. 003 <span class="dot">·</span> <span id="clock"></span></div>
+  </div>
+
+  <div class="slide-label"><span class="no">I.</span> The Intake Interview</div>
+  <h1>You describe it.<br><em>The crew scopes it.</em></h1>
+
+  <div id="interview" class="interview">
+    <div id="transcript" class="transcript"></div>
+    <div id="chips" class="chips"></div>
+    <div id="brief-wrap">
+      <div class="brief-label">The work, in plain words <b>*</b></div>
+      <textarea id="brief" rows="6" placeholder="Describe the work. Plain words, no tickets.&#10;&#10;e.g. Customers want prompt history export via an API endpoint, not just the UI download."></textarea>
+    </div>
+  </div>
+
+  <div class="crew-line">
+    Crew status: <span class="live">9 agents online</span> <span>·</span> 3 harnesses
+    <span>·</span> planner <span class="dot">/</span> builders <span class="dot">/</span> security
+    <span class="dot">/</span> deployer <span>·</span> first customer: <span>lexis</span>
+  </div>
+
+  <div class="folio"><span><b>I</b> / IV — The Brief</span><span>↓</span></div>
+</section>
+
+<!-- ═══════════ SLIDE II ═══════════ -->
+<section class="slide" id="s2">
+  <div class="slide-label"><span class="no">II.</span> The Crew Configuration</div>
+  <h2>Pick how hard the factory works.</h2>
+
+  <table class="manifest">
+    <thead>
+      <tr><th>Configuration</th><th class="hide-m">Review passes</th><th class="hide-m">Governance</th><th class="t-fill">Price</th></tr>
+    </thead>
+    <tbody>
+      <tr class="row" data-tier="mvp" id="row-mvp">
+        <td><div class="t-name">MVP</div><div class="t-model">Grok-3-mini · 1 builder · best effort</div></td>
+        <td class="hide-m">1</td>
+        <td class="hide-m">—</td>
+        <td class="t-fill"><span class="t-price" id="price-mvp">—</span></td>
+      </tr>
+      <tr class="row selected" data-tier="mid" id="row-mid">
+        <td><div class="t-name">Mid-tier</div><div class="t-model">Claude Sonnet · full crew · Snyk-gated</div></td>
+        <td class="hide-m">2</td>
+        <td class="hide-m">Reviewer sign-off</td>
+        <td class="t-fill"><span class="t-price" id="price-mid">—</span></td>
+      </tr>
+      <tr class="row" data-tier="premium" id="row-premium">
+        <td><div class="t-name">Premium</div><div class="t-model">Claude Opus + extended thinking · deep security scan</div></td>
+        <td class="hide-m">3</td>
+        <td class="hide-m">Founder sign-off before deploy</td>
+        <td class="t-fill"><span class="t-price" id="price-premium">—</span></td>
+      </tr>
+      <tr class="row" data-tier="flagship" id="row-flagship">
+        <td><div class="t-name">Flagship</div><div class="t-model">Fable — frontier model · full crew at maximum depth</div></td>
+        <td class="hide-m">4</td>
+        <td class="hide-m">Founder sign-off · priority queue · war-room cadence</td>
+        <td class="t-fill"><span class="t-price" id="price-flagship">—</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="folio"><span><b>II</b> / IV — Crew Configuration</span><span>↓</span></div>
+</section>
+
+<!-- ═══════════ SLIDE III ═══════════ -->
+<section class="slide" id="s3">
+  <div class="slide-label"><span class="no">III.</span> The Quote — Honest Math</div>
+  <h2>We show you the factory's cost.</h2>
+
+  <div class="ledger">
+    <div class="line"><span class="k">Work</span><span class="v" id="q-work">—</span></div>
+    <div class="line"><span class="k">Surfaces</span><span class="v" id="q-surface">—</span></div>
+    <div class="line"><span class="k">Auth / payments</span><span class="v" id="q-gate">—</span></div>
+    <div class="line"><span class="k">Queue</span><span class="v" id="q-rush">—</span></div>
+    <div class="line"><span class="k">Model</span><span class="v" id="q-model">—</span></div>
+    <div class="line"><span class="k">Agent tokens</span><span class="v" id="q-tokens">—</span></div>
+    <div class="line"><span class="k">Review passes</span><span class="v" id="q-reviews">—</span></div>
+    <div class="line"><span class="k">Agent compute cost</span><span class="v" id="q-cost">—</span></div>
+    <div class="line"><span class="k">Margin ×2</span><span class="v" id="q-margin">×2</span></div>
+    <div class="line total"><span class="k">Price</span><span class="v" id="q-price">—</span></div>
+  </div>
+
+  <div class="wallet">Wallet: <b id="credits">…</b> credits on file · Flexprice</div>
+
+  <div class="folio"><span><b>III</b> / IV — The Quote</span><span>↓</span></div>
+</section>
+
+<!-- ═══════════ SLIDE IV ═══════════ -->
+<section class="slide" id="s4">
+  <div class="slide-label"><span class="no">IV.</span> Dispatch</div>
+  <h2>Send it to the factory floor.</h2>
+
+  <button id="dispatch-btn">Dispatch to crew →</button>
+
+  <div class="stamp" id="stamp">Dispatched</div>
+
+  <div class="receipt" id="receipt"></div>
+
+  <div class="folio">
+    <span><b>IV</b> / IV — Dispatch</span>
+    <span>CrewKit · Boxford fleet · Band + Cognee + Snyk + Flexprice</span>
+  </div>
+</section>
+
+<script>
+let tier = "mid";
+const answers = {};
+
+const clock = document.getElementById("clock");
+setInterval(() => clock.textContent = new Date().toLocaleTimeString(), 1000);
+
+/* --- the intake interview --- */
+
+const QUESTIONS = [
+  {key: "work", q: "What kind of work is this?",
+   opts: [["polish", "Polish an existing feature"], ["feature", "New feature, existing app"],
+          ["integration", "New integration — auth, payments, API"], ["app", "A whole new app"]]},
+  {key: "surface", q: "Which surfaces does it touch?",
+   opts: [["ui", "UI only"], ["api", "API only"], ["both", "UI and API"]]},
+  {key: "gate", q: "Does it involve auth or payments?",
+   opts: [["no_gate", "No"], ["gate", "Yes — auth or payments"]]},
+  {key: "rush", q: "How urgent is it?",
+   opts: [["standard", "Standard queue"], ["rush", "Rush — priority queue"]]},
+];
+
+const transcript = document.getElementById("transcript");
+const chips = document.getElementById("chips");
+let qi = 0;
+
+function addLine(cls, text) {
+  const div = document.createElement("div");
+  div.className = cls;
+  div.textContent = text;
+  transcript.appendChild(div);
+}
+
+function askNext() {
+  if (qi >= QUESTIONS.length) { interviewDone(); return; }
+  const q = QUESTIONS[qi];
+  addLine("q", q.q);
+  chips.innerHTML = "";
+  q.opts.forEach(([val, label]) => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = label;
+    b.onclick = () => {
+      addLine("a", label);
+      answers[q.key] = val;
+      b.classList.add("picked");
+      qi++;
+      setTimeout(askNext, 150);
+    };
+    chips.appendChild(b);
+  });
+}
+
+function interviewDone() {
+  chips.innerHTML = "";
+  addLine("q", "Scoping complete. The estimate is on Slide III — describe the work beside these questions and dispatch.");
+  refreshQuote();
+}
+
+addLine("q", "Before the crew prices your work, four questions. The estimate builds as you answer.");
+askNext();
+
+/* --- quote + ledger --- */
+
+async function refreshQuote() {
+  const qs = new URLSearchParams({tier, ...answers});
+  for (const t of ["mvp", "mid", "premium", "flagship"]) {
+    const p = new URLSearchParams({tier: t, work: answers.work || "feature",
+                                    surface: answers.surface || "both",
+                                    gate: answers.gate || "no_gate", rush: answers.rush || "standard"});
+    const r = await fetch(`/api/quote?${p}`);
+    const q = await r.json();
+    if (q.price_usd) document.getElementById(`price-${t}`).textContent = `$${q.price_usd}`;
+    if (t === tier && q.price_usd) fillLedger(q);
+  }
+}
+
+function fillLedger(q) {
+  document.getElementById("q-work").textContent = q.work_label;
+  document.getElementById("q-surface").textContent = q.surface_label;
+  document.getElementById("q-gate").textContent = q.gate_label;
+  document.getElementById("q-rush").textContent = q.rush_label;
+  document.getElementById("q-model").textContent = q.model;
+  document.getElementById("q-tokens").textContent =
+    `${q.scoped_tokens.toLocaleString()} scoped → ${q.est_tokens.toLocaleString()} w/ tier`;
+  document.getElementById("q-reviews").textContent = q.reviews;
+  document.getElementById("q-cost").textContent = `$${q.est_agent_cost_usd}`;
+  document.getElementById("q-price").textContent = `$${q.price_usd}`;
+}
+
+async function refreshCredits() {
+  const r = await fetch("/api/credits");
+  const c = await r.json();
+  document.getElementById("credits").textContent = c.balance ?? "—";
+}
+
+/* --- tiers + dispatch --- */
+
+document.querySelectorAll("tr.row").forEach(row => {
+  row.addEventListener("click", () => {
+    document.querySelectorAll("tr.row").forEach(r => r.classList.remove("selected"));
+    row.classList.add("selected");
+    tier = row.dataset.tier;
+    refreshQuote();
+  });
+});
+
+document.getElementById("dispatch-btn").addEventListener("click", async () => {
+  const brief = document.getElementById("brief").value.trim();
+  const receipt = document.getElementById("receipt");
+  const stamp = document.getElementById("stamp");
+  const btn = document.getElementById("dispatch-btn");
+  if (!brief) {
+    receipt.classList.add("on");
+    receipt.innerHTML = '<span class="err">No brief on file. Return to Slide I and finish the interview.</span>';
+    document.getElementById("s1").scrollIntoView({behavior: "smooth"});
+    return;
+  }
+  btn.disabled = true; btn.textContent = "Checking credits…";
+  const r = await fetch("/api/order", {method: "POST", headers: {"Content-Type": "application/json"},
+                                       body: JSON.stringify({brief, tier, ...answers})});
+  const j = await r.json();
+  btn.disabled = false; btn.textContent = "Dispatch to crew →";
+  receipt.classList.add("on");
+  if (r.ok) {
+    stamp.classList.remove("on"); void stamp.offsetWidth; stamp.classList.add("on");
+    receipt.innerHTML =
+      `ORDER DISPATCHED — ${j.tier} tier, $${j.price_usd}.<br>` +
+      `Scope: ${j.scope}. The crew has the brief and the scoping from your interview.<br>` +
+      `Watch the floor: <b>app.band.ai</b> · room: lexis-crew`;
+    refreshCredits();
+  } else {
+    receipt.innerHTML = `<span class="err">${j.error}</span>` +
+      (j.needed ? `<br>Need $${j.needed}, wallet holds $${j.balance}. Top up at us.flexprice.io.` : "");
+  }
+});
+
+refreshCredits();
+</script>
+</body>
+</html>
